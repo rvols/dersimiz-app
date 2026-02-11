@@ -5,7 +5,9 @@
     "**/.expo": true,
     "**/dist": true,
     "**/build": true,
-    "**/.git": true
+    "**/.git": true,
+    "mobile/node_modules": true,
+    "mobile/.expo": true
   },
   "git.ignoreLimitWarning": true
 }

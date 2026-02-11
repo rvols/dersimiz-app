@@ -1,5 +1,7 @@
 # Dependencies
 node_modules/
+**/node_modules/
+mobile/node_modules/
 .pnp/
 .pnp.js
 
@@ -12,6 +14,8 @@ web-build/
 
 # Expo (mobile)
 .expo/
+**/.expo/
+mobile/.expo/
 expo-env.d.ts
 .metro-health-check*
 
