@@ -1,0 +1,11 @@
+# Normalize line endings: checkout with CRLF on Windows, store LF in repo
+* text=auto eol=lf
+*.{cmd,[cC][mM][dD]} text eol=crlf
+*.{bat,[bB][aA][tT]} text eol=crlf
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.ico binary
+*.gif binary
