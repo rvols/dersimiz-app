@@ -1,0 +1,61 @@
+# Dependencies
+node_modules/
+.pnp/
+.pnp.js
+
+# Build / output
+dist/
+build/
+out/
+web-build/
+*.tsbuildinfo
+
+# Expo (mobile)
+.expo/
+expo-env.d.ts
+.metro-health-check*
+
+# Native (React Native / Expo)
+ios/
+android/
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Environment and secrets
+.env
+.env.*
+.env*.local
+!.env.example
+
+# Debug and logs
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+*.pem
+
+# IDE and editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Testing and coverage
+coverage/
+.nyc_output/
+*.lcov
+
+# Misc
+*.bak
+.cache/
