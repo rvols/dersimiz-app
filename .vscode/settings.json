@@ -1,0 +1,11 @@
+{
+  "explorer.excludeGitIgnore": true,
+  "files.exclude": {
+    "**/node_modules": true,
+    "**/.expo": true,
+    "**/dist": true,
+    "**/build": true,
+    "**/.git": true
+  },
+  "git.ignoreLimitWarning": true
+}
