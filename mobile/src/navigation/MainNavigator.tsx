@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { View, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '../store/useAuthStore';
+import { ApprovalStatusNotifier } from '../components/ApprovalStatusNotifier';
+import { useSupportUnreadStore, useSupportUnreadRefresh, useSupportUnreadPoll } from '../store/useSupportUnreadStore';
 import { TutorDashboardScreen } from '../screens/main/TutorDashboardScreen';
 import { StudentDashboardScreen } from '../screens/main/StudentDashboardScreen';
 import { StudentsScreen } from '../screens/main/StudentsScreen';
@@ -25,6 +27,28 @@ function TabIcon({ name, focused }: { name: keyof typeof Ionicons.glyphMap; focu
         size={24}
         color={focused ? colors.electricAzure : colors.slateText}
       />
+    </View>
+  );
+}
+
+function ProfileTabIcon({ focused }: { focused: boolean }) {
+  const supportUnread = useSupportUnreadStore((s) => s.count);
+  const fetchSupportUnread = useSupportUnreadStore((s) => s.fetchCount);
+  useEffect(() => {
+    fetchSupportUnread();
+  }, [fetchSupportUnread]);
+  return (
+    <View style={styles.tabIcon}>
+      <Ionicons
+        name="person"
+        size={24}
+        color={focused ? colors.electricAzure : colors.slateText}
+      />
+      {supportUnread > 0 && (
+        <View style={styles.tabBadge}>
+          <Text style={styles.tabBadgeText}>{supportUnread > 99 ? '99+' : supportUnread}</Text>
+        </View>
+      )}
     </View>
   );
 }
@@ -59,8 +83,10 @@ function TutorTabs({ rootNav }: { rootNav: { navigate: (name: string, params?: o
           <TutorDashboardScreen
             onManageLessons={() => rootNav.navigate('Lessons')}
             onSetAvailability={() => rootNav.navigate('Availability')}
-            onCompleteProfile={() => rootNav.navigate('Profile')}
+            onSchoolTypesGrades={() => rootNav.navigate('SchoolTypesGrades')}
+            onCompleteProfile={() => rootNav.navigate('Main', { screen: 'Profile' })}
             onSubscription={() => rootNav.navigate('Subscription')}
+            onSupport={() => rootNav.navigate('Support')}
           />
         )}
       </Tab.Screen>
@@ -81,16 +107,18 @@ function TutorTabs({ rootNav }: { rootNav: { navigate: (name: string, params?: o
       </Tab.Screen>
       <Tab.Screen
         name="Profile"
-        options={{ title: t('nav.profile'), tabBarLabel: t('nav.profile'), tabBarIcon: ({ focused }) => <TabIcon name="person" focused={focused} /> }}
+        options={{ title: t('nav.profile'), tabBarLabel: t('nav.profile'), tabBarIcon: ({ focused }) => <ProfileTabIcon focused={focused} /> }}
       >
         {() => (
           <ProfileScreen
             onSettings={() => rootNav.navigate('Settings')}
             onSubscription={() => rootNav.navigate('Subscription')}
+            onTransactions={() => rootNav.navigate('Transactions')}
             onBoosters={() => rootNav.navigate('Boosters')}
             onSupport={() => rootNav.navigate('Support')}
             onLessons={() => rootNav.navigate('Lessons')}
             onAvailability={() => rootNav.navigate('Availability')}
+            onSchoolTypesGrades={() => rootNav.navigate('SchoolTypesGrades')}
             onNotifications={() => rootNav.navigate('Notifications')}
           />
         )}
@@ -186,7 +214,7 @@ function StudentTabs({ rootNav }: { rootNav: { navigate: (name: string, params?:
       </Tab.Screen>
       <Tab.Screen
         name="Profile"
-        options={{ title: t('nav.profile'), tabBarLabel: t('nav.profile'), tabBarIcon: ({ focused }) => <TabIcon name="person" focused={focused} /> }}
+        options={{ title: t('nav.profile'), tabBarLabel: t('nav.profile'), tabBarIcon: ({ focused }) => <ProfileTabIcon focused={focused} /> }}
       >
         {() => (
           <ProfileScreen
@@ -203,11 +231,15 @@ function StudentTabs({ rootNav }: { rootNav: { navigate: (name: string, params?:
 export function MainNavigator({ navigation }: { navigation: { navigate: (a: string, b?: object) => void } }) {
   const user = useAuthStore((s) => s.user);
   const isTutor = user?.role === 'tutor';
+  useSupportUnreadRefresh();
+  useSupportUnreadPoll();
 
-  if (isTutor) {
-    return <TutorTabs rootNav={navigation} />;
-  }
-  return <StudentTabs rootNav={navigation} />;
+  return (
+    <>
+      <ApprovalStatusNotifier />
+      {isTutor ? <TutorTabs rootNav={navigation} /> : <StudentTabs rootNav={navigation} />}
+    </>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -223,5 +255,18 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   tabBarLabel: { ...typography.caption, fontWeight: '500' },
-  tabIcon: { alignItems: 'center', justifyContent: 'center' },
+  tabIcon: { alignItems: 'center', justifyContent: 'center', position: 'relative' },
+  tabBadge: {
+    position: 'absolute',
+    top: -4,
+    right: -10,
+    minWidth: 16,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: colors.alertCoral,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 4,
+  },
+  tabBadgeText: { ...typography.caption, color: colors.cleanWhite, fontSize: 10, fontWeight: '600' },
 });

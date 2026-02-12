@@ -104,6 +104,8 @@
       "verified": "Verified Tutor",
       "pending_review": "Pending Review",
       "reviewing_profile": "We are reviewing your profile",
+      "rejected": "Application Rejected",
+      "view_rejection_reason": "Tap to view the reason",
       "complete_profile": "Complete your profile",
       "boost_visibility": "Boost your visibility to students",
       "tap_to_complete": "Tap to complete",
@@ -112,6 +114,8 @@
       "missing_lessons": "Add lesson types & pricing",
       "missing_availability": "Set your availability",
       "missing_education": "Add education & grades",
+      "quick_actions": "Quick Actions",
+      "grades_count": "{{count}} grades",
       "performance_overview": "Performance Overview",
       "profile_views": "Profile Views",
       "this_week": "This week",
@@ -120,11 +124,13 @@
       "lessons": "Active Lessons",
       "availability": "Availability",
       "manage_schedule": "Manage your schedule",
+      "hours_per_week": "{{hours}} h/week",
       "peak_hours": "Peak Hours",
       "most_views_evening": "Most views in the evening",
       "popular_subject": "Popular Subject",
       "mathematics_trending": "Mathematics is trending",
-      "my_students": "My Students"
+      "my_students": "My Students",
+      "subscription_search_note": "You will appear in student search only after subscribing to a plan."
     },
     "student": {
       "greeting_label": "Let's go",
@@ -199,6 +205,11 @@
   "profile": {
     "title": "Profile",
     "edit": "Edit profile",
+    "approval_hint": "Changing profile image and name will require an approval again.",
+    "status_approved": "Approved",
+    "status_pending": "Pending",
+    "status_rejected": "Rejected",
+    "avatar_updated": "Profile photo updated",
     "completeness": "Profile {{percent}}% complete",
     "logout": "Log out",
     "delete_account": "Delete account",
@@ -229,6 +240,7 @@
   },
   "subscription": {
     "title": "Subscription",
+    "transactions_title": "Transactions",
     "current": "Current plan",
     "renews": "Renews {{date}}",
     "plans": "Plans",
@@ -237,7 +249,9 @@
     "per_month": "/month",
     "per_year": "/year",
     "restore": "Restore purchases",
-    "subscribe": "Subscribe"
+    "subscribe": "Subscribe",
+    "view_transactions": "View transactions",
+    "no_transactions": "No transactions yet"
   },
   "boosters": {
     "title": "Boosters",
@@ -250,18 +264,27 @@
   },
   "support": {
     "title": "Support",
-    "subject_placeholder": "Subject (optional)",
+    "subject_placeholder": "Subject (required)",
+    "subject_required": "Subject is required",
     "support_label": "Support",
     "placeholder": "How can we help?",
     "send": "Send",
     "status": "Status",
     "open": "Open",
     "replied": "Replied",
-    "closed": "Closed"
+    "closed": "Closed",
+    "new_ticket": "New Ticket",
+    "create": "Create",
+    "close_ticket": "Close Ticket",
+    "no_tickets": "No support tickets yet. Create one to get help.",
+    "no_messages": "No messages yet",
+    "subject_approval_process": "Approval process"
   },
   "notifications": {
     "title": "Notifications",
-    "empty": "No notifications"
+    "empty": "No notifications",
+    "approval_approved": "Your profile has been approved!",
+    "approval_rejected": "Your profile was rejected. View the reason in Support."
   },
   "availability": {
     "day_sun": "Sun",
@@ -299,6 +322,7 @@
   },
   "common": {
     "loading": "Loading...",
+    "back": "Back",
     "unknown": "Unknown",
     "error": "Something went wrong",
     "error_loading_data": "Failed to load data",

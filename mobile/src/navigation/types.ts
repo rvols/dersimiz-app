@@ -34,11 +34,13 @@ export type RootStackParamList = {
   ChatThread: { conversationId: string; otherName: string };
   Support: undefined;
   Subscription: undefined;
+  Transactions: undefined;
   Boosters: undefined;
   Notifications: undefined;
   Settings: undefined;
   Lessons: undefined;
   Availability: undefined;
+  SchoolTypesGrades: undefined;
 };
 
 export type ChatThreadParams = RootStackParamList['ChatThread'];

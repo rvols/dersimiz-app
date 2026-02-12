@@ -48,9 +48,16 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   login: async (payload) => {
+    // Always send session_token when available so verify-otp matches the same session (fixes first-try fail when API uses in-memory store across workers)
+    const body = {
+      phone_number: payload.phone_number,
+      otp_code: payload.otp_code,
+      country_code: payload.country_code,
+      ...(payload.session_token && { session_token: payload.session_token }),
+    };
     const { data } = await api.post<{ data: LoginResult & { access_token: string; refresh_token: string } }>(
       '/auth/verify-otp',
-      payload
+      body
     );
     const d = data?.data ?? data;
     if (!d?.access_token || !d?.refresh_token || !d?.user) {
@@ -78,7 +85,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   updateProfile: async (body) => {
-    const { data } = await api.put<{ data: { user: User } }>('/profile', body);
-    if (data?.data?.user) set({ user: data.data.user });
+    const res = await api.put<{ success?: boolean; data?: { user?: User } }>('/profile', body);
+    const user = res?.data?.data?.user ?? res?.data?.user;
+    if (user) set({ user });
+    else await get().hydrate();
   },
 }));

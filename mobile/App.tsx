@@ -28,9 +28,16 @@ export default function App() {
   }, [hydrateLocale, hydrateAuth]);
 
   useEffect(() => {
-    if (prevUserRef.current?.id && !user?.id && navRef.current?.isReady()) {
+    const prev = prevUserRef.current;
+    if (prev?.id && !user?.id && navRef.current?.isReady()) {
       navRef.current.dispatch(
         CommonActions.reset({ index: 0, routes: [{ name: 'Auth' }] })
+      );
+    }
+    // When user logs in (was logged out, now has role + onboarding done), navigate to Main
+    if (!prev?.id && user?.id && user?.role && user?.onboarding_completed && navRef.current?.isReady()) {
+      navRef.current.dispatch(
+        CommonActions.reset({ index: 0, routes: [{ name: 'Main' }] })
       );
     }
     prevUserRef.current = user;

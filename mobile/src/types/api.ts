@@ -14,6 +14,7 @@ export interface User {
   avatar_url: string | null;
   is_approved: boolean;
   is_banned?: boolean;
+  is_rejected?: boolean;
   onboarding_completed: boolean;
   created_at?: string;
   updated_at?: string;

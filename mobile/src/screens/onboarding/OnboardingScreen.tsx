@@ -11,6 +11,7 @@ import { colors, typography, spacing } from '../../theme';
 import { api, getApiErrorMessage } from '../../services/api';
 import { useAuthStore } from '../../store/useAuthStore';
 import { pickAndUploadAvatar } from '../../services/avatar';
+import { AvatarImage } from '../../components/AvatarImage';
 import type { OnboardingData, LessonType, Grade } from '../../types/api';
 import { CommonActions } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -547,7 +548,7 @@ export function OnboardingScreen({ navigation }: Props) {
               <Card style={styles.overviewCard}>
                 <View style={styles.overviewProfileRow}>
                   {user?.avatar_url ? (
-                    <Image source={{ uri: user.avatar_url }} style={styles.overviewAvatar} />
+                    <AvatarImage uri={user.avatar_url} fallbackText={fullName?.charAt(0)} style={styles.overviewAvatar} />
                   ) : (
                     <View style={styles.overviewAvatarPlaceholder}>
                       <Ionicons name="person" size={28} color={colors.electricAzure} />

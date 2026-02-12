@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { useNavigation } from '@react-navigation/native';
 import { Card, Button } from '../../components/ui';
 import { colors, typography, spacing } from '../../theme';
 import { api } from '../../services/api';
@@ -10,6 +11,7 @@ const localeName = (lang: 'tr' | 'en') => (o: Record<string, string> | undefined
 
 export function SubscriptionScreen() {
   const { t, i18n } = useTranslation();
+  const navigation = useNavigation();
   const lang = (i18n.language === 'tr' ? 'tr' : 'en') as 'tr' | 'en';
   const getDisplayName = localeName(lang);
   const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
@@ -60,6 +62,9 @@ export function SubscriptionScreen() {
         </Card>
       ))}
       <Button title={t('subscription.restore')} variant="outline" onPress={() => {}} style={styles.restore} />
+      <TouchableOpacity onPress={() => (navigation as { navigate: (name: string) => void }).navigate('Transactions')} style={styles.transactionsLink}>
+        <Text style={styles.transactionsLinkText}>{t('subscription.view_transactions', { defaultValue: 'View transactions' })}</Text>
+      </TouchableOpacity>
     </ScrollView>
   );
 }
@@ -77,4 +82,6 @@ const styles = StyleSheet.create({
   price: { ...typography.body, color: colors.slateText },
   btn: { marginTop: spacing.sm },
   restore: { marginTop: spacing.md },
+  transactionsLink: { marginTop: spacing.lg, alignSelf: 'center' },
+  transactionsLinkText: { ...typography.label, color: colors.electricAzure },
 });

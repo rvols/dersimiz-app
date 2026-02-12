@@ -18,9 +18,11 @@ interface DashboardData {
   impressions?: number;
   contacts?: number;
   lesson_count?: number;
+  grade_count?: number;
   profile_completeness?: number;
   missing_fields?: string[];
-  subscription_status?: string;
+  subscription_status?: string | null;
+  total_availability_hours?: number;
   profile?: { full_name?: string };
   earnings_this_month?: number;
   upcoming_sessions?: number;
@@ -37,23 +39,39 @@ const MISSING_FIELD_KEYS: Record<string, string> = {
 export function TutorDashboardScreen({
   onManageLessons,
   onSetAvailability,
+  onSchoolTypesGrades,
   onCompleteProfile,
   onSubscription,
+  onSupport,
 }: {
   onManageLessons?: () => void;
   onSetAvailability?: () => void;
+  onSchoolTypesGrades?: () => void;
   onCompleteProfile?: () => void;
   onSubscription?: () => void;
+  onSupport?: () => void;
 } = {}) {
   const { t } = useTranslation();
   const user = useAuthStore((s) => s.user);
+  const hydrate = useAuthStore((s) => s.hydrate);
   const [data, setData] = useState<DashboardData | null>(null);
   const [refreshing, setRefreshing] = useState(false);
 
   const load = async () => {
     try {
-      const { data: res } = await api.get<{ data: DashboardData }>('/tutor/dashboard');
-      setData(res?.data ?? null);
+      const response = await api.get<{ success?: boolean; data?: DashboardData }>('/tutor/dashboard');
+      const body = response?.data;
+      const dashboardData = body?.data ?? body;
+      if (dashboardData && typeof dashboardData === 'object') {
+        setData({
+          ...dashboardData,
+          grade_count: typeof dashboardData.grade_count === 'number'
+            ? dashboardData.grade_count
+            : parseInt(String(dashboardData.grade_count ?? 0), 10) || 0,
+        });
+      } else {
+        setData(null);
+      }
     } catch (_) { }
   };
 
@@ -63,6 +81,7 @@ export function TutorDashboardScreen({
 
   const onRefresh = async () => {
     setRefreshing(true);
+    await hydrate();
     await load();
     setRefreshing(false);
   };
@@ -100,8 +119,26 @@ export function TutorDashboardScreen({
         )}
       </View>
 
-      {/* Approval Status Banner */}
-      {!user?.is_approved && (
+      {/* Rejected Banner - tap to view reason in support */}
+      {user?.is_rejected && onSupport && (
+        <Pressable onPress={onSupport} style={styles.bannerWrap}>
+          <Card variant="tutor" style={styles.bannerRejected}>
+            <View style={styles.bannerContent}>
+              <View style={[styles.bannerIcon, styles.bannerIconRejected]}>
+                <Ionicons name="alert-circle-outline" size={24} color={colors.alertCoral} />
+              </View>
+              <View style={styles.bannerText}>
+                <Text style={[styles.bannerTitle, styles.bannerTitleRejected]}>{t('dashboard.tutor.rejected')}</Text>
+                <Text style={styles.bannerSubtitle}>{t('dashboard.tutor.view_rejection_reason')}</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color={colors.slateText} />
+            </View>
+          </Card>
+        </Pressable>
+      )}
+
+      {/* Approval Status Banner - pending review */}
+      {!user?.is_approved && !user?.is_rejected && (
         <Card variant="tutor" style={styles.banner}>
           <View style={styles.bannerContent}>
             <View style={styles.bannerIcon}>
@@ -138,30 +175,36 @@ export function TutorDashboardScreen({
         </Pressable>
       )}
 
-      {/* Performance overview - compact row, no static trend */}
+      {/* Performance overview - stacked vertically */}
       <View style={styles.metricsSection}>
         <Text style={styles.sectionTitle}>{t('dashboard.tutor.performance_overview')}</Text>
-        <View style={styles.metricsRow}>
+        <View style={styles.metricsColumn}>
           <Card variant="tutor" style={styles.metricCard}>
             <View style={[styles.metricIconWrap, { backgroundColor: colors.calmTeal + '18' }]}>
               <Ionicons name="eye" size={22} color={colors.calmTeal} />
             </View>
-            <Text style={styles.metricNumber}>{data?.impressions ?? 0}</Text>
-            <Text style={styles.metricCaption}>{t('dashboard.tutor.profile_views')}</Text>
+            <View style={styles.metricTextWrap}>
+              <Text style={styles.metricNumber}>{data?.impressions ?? 0}</Text>
+              <Text style={styles.metricCaption}>{t('dashboard.tutor.profile_views')}</Text>
+            </View>
           </Card>
           <Card variant="tutor" style={styles.metricCard}>
             <View style={[styles.metricIconWrap, { backgroundColor: colors.electricAzure + '18' }]}>
               <Ionicons name="chatbubbles" size={22} color={colors.electricAzure} />
             </View>
-            <Text style={styles.metricNumber}>{data?.contacts ?? 0}</Text>
-            <Text style={styles.metricCaption}>{t('dashboard.tutor.new_contacts')}</Text>
+            <View style={styles.metricTextWrap}>
+              <Text style={styles.metricNumber}>{data?.contacts ?? 0}</Text>
+              <Text style={styles.metricCaption}>{t('dashboard.tutor.new_contacts')}</Text>
+            </View>
           </Card>
           <Card variant="tutor" style={styles.metricCard}>
             <View style={[styles.metricIconWrap, { backgroundColor: colors.warmGold + '18' }]}>
               <Ionicons name="calendar" size={22} color={colors.warmGold} />
             </View>
-            <Text style={styles.metricNumber}>{data?.upcoming_sessions ?? 0}</Text>
-            <Text style={styles.metricCaption}>{t('dashboard.tutor.sessions')}</Text>
+            <View style={styles.metricTextWrap}>
+              <Text style={styles.metricNumber}>{data?.upcoming_sessions ?? 0}</Text>
+              <Text style={styles.metricCaption}>{t('dashboard.tutor.sessions')}</Text>
+            </View>
           </Card>
         </View>
       </View>
@@ -170,14 +213,33 @@ export function TutorDashboardScreen({
       <View style={styles.actionsSection}>
         <Text style={styles.sectionTitle}>{t('dashboard.tutor.quick_actions')}</Text>
 
-        <View style={styles.actionsGrid}>
+        <View style={styles.actionsColumn}>
           {onManageLessons && (
             <Pressable onPress={onManageLessons} style={styles.actionCard}>
               <View style={[styles.actionIcon, { backgroundColor: colors.calmTeal + '15' }]}>
                 <Ionicons name="book" size={24} color={colors.calmTeal} />
               </View>
-              <Text style={styles.actionTitle}>{t('dashboard.tutor.lessons')}</Text>
-              <Text style={styles.actionSubtitle}>{data?.lesson_count ?? 0} {t('common.active')}</Text>
+              <View style={styles.actionTextWrap}>
+                <Text style={styles.actionTitle}>{t('dashboard.tutor.lessons')}</Text>
+                <Text style={styles.actionSubtitle}>{data?.lesson_count ?? 0} {t('common.active')}</Text>
+              </View>
+            </Pressable>
+          )}
+
+          {onSchoolTypesGrades && (
+            <Pressable onPress={onSchoolTypesGrades} style={styles.actionCard}>
+              <View style={[styles.actionIcon, { backgroundColor: colors.warmGold + '15' }]}>
+                <Ionicons name="school" size={24} color={colors.warmGold} />
+              </View>
+              <View style={styles.actionTextWrap}>
+                <Text style={styles.actionTitle}>{t('onboarding.education')}</Text>
+                <Text style={styles.actionSubtitle}>
+                  {t('dashboard.tutor.grades_count', {
+                    count: typeof data?.grade_count === 'number' ? data.grade_count : (parseInt(String(data?.grade_count ?? 0), 10) || 0),
+                    defaultValue: '{{count}} grades',
+                  })}
+                </Text>
+              </View>
             </Pressable>
           )}
 
@@ -186,8 +248,14 @@ export function TutorDashboardScreen({
               <View style={[styles.actionIcon, { backgroundColor: colors.electricAzure + '15' }]}>
                 <Ionicons name="time" size={24} color={colors.electricAzure} />
               </View>
-              <Text style={styles.actionTitle}>{t('dashboard.tutor.availability')}</Text>
-              <Text style={styles.actionSubtitle}>{t('dashboard.tutor.manage_schedule')}</Text>
+              <View style={styles.actionTextWrap}>
+                <Text style={styles.actionTitle}>{t('dashboard.tutor.availability')}</Text>
+                <Text style={styles.actionSubtitle}>
+                  {typeof data?.total_availability_hours === 'number'
+                    ? t('dashboard.tutor.hours_per_week', { hours: data.total_availability_hours, defaultValue: '{{hours}} h/week' })
+                    : t('dashboard.tutor.manage_schedule')}
+                </Text>
+              </View>
             </Pressable>
           )}
         </View>
@@ -203,11 +271,12 @@ export function TutorDashboardScreen({
               </View>
               <View>
                 <Text style={styles.subscriptionTitle}>{t('dashboard.tutor.subscription')}</Text>
-                <Text style={styles.subscriptionStatus}>{data?.subscription_status ?? t('common.free_plan')}</Text>
+                <Text style={styles.subscriptionStatus}>{data?.subscription_status != null ? String(data.subscription_status) : t('common.free_plan')}</Text>
               </View>
             </View>
             <Ionicons name="chevron-forward" size={20} color={colors.slateText} />
           </View>
+          <Text style={styles.subscriptionNote}>{t('dashboard.tutor.subscription_search_note')}</Text>
         </Card>
       </Pressable>
 
@@ -297,6 +366,22 @@ const styles = StyleSheet.create({
     backgroundColor: colors.warmGold + '10',
     borderColor: colors.warmGold + '30',
   },
+  bannerWrap: {
+    marginBottom: spacing.lg,
+  },
+  bannerRejected: {
+    marginBottom: 0,
+    backgroundColor: colors.alertCoral + '12',
+    borderColor: colors.alertCoral + '40',
+    borderWidth: 1,
+    overflow: 'hidden',
+  },
+  bannerTitleRejected: {
+    color: colors.alertCoral,
+  },
+  bannerIconRejected: {
+    backgroundColor: colors.alertCoral + '20',
+  },
   bannerContent: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -372,15 +457,15 @@ const styles = StyleSheet.create({
     color: colors.carbonText,
     marginBottom: spacing.md,
   },
-  metricsRow: {
-    flexDirection: 'row',
+  metricsColumn: {
+    flexDirection: 'column',
     gap: spacing.sm,
   },
   metricCard: {
-    flex: 1,
     padding: spacing.md,
     alignItems: 'center',
-    minWidth: 0,
+    flexDirection: 'row',
+    gap: spacing.md,
   },
   metricIconWrap: {
     width: 44,
@@ -388,28 +473,30 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: spacing.sm,
+  },
+  metricTextWrap: {
+    flex: 1,
   },
   metricNumber: {
     ...typography.stats,
     color: colors.carbonText,
     fontSize: 20,
-    marginBottom: spacing.xxs,
   },
   metricCaption: {
     ...typography.caption,
     color: colors.slateText,
-    textAlign: 'center',
+    marginTop: spacing.xxs,
   },
   actionsSection: {
     marginBottom: spacing.lg,
   },
-  actionsGrid: {
-    flexDirection: 'row',
+  actionsColumn: {
+    flexDirection: 'column',
     gap: spacing.sm,
   },
   actionCard: {
-    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: colors.cleanWhite,
     padding: spacing.lg,
     borderRadius: 16,
@@ -423,17 +510,20 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: spacing.sm,
+    marginRight: spacing.md,
+  },
+  actionTextWrap: {
+    flex: 1,
   },
   actionTitle: {
     ...typography.label,
     color: colors.carbonText,
     fontWeight: '600',
-    marginBottom: spacing.xxs,
   },
   actionSubtitle: {
     ...typography.caption,
     color: colors.slateText,
+    marginTop: spacing.xxs,
   },
   subscriptionCard: {
     marginBottom: spacing.lg,
@@ -466,6 +556,11 @@ const styles = StyleSheet.create({
     color: colors.carbonText,
     fontSize: 16,
     marginTop: spacing.xxs,
+  },
+  subscriptionNote: {
+    ...typography.caption,
+    color: colors.slateText,
+    marginTop: spacing.sm,
   },
   insightsSection: {
     marginBottom: spacing.lg,

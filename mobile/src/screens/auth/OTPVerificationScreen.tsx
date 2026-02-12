@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { CommonActions } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { Button, Card } from '../../components/ui';
 import { SafeTopView } from '../../components/SafeTopView';
@@ -29,6 +30,10 @@ export function OTPVerificationScreen({ route, navigation }: Props) {
   const inputRef = useRef<TextInput>(null);
 
   useEffect(() => {
+    if (route.params.sessionToken) setSessionToken(route.params.sessionToken);
+  }, [route.params.sessionToken]);
+
+  useEffect(() => {
     let t: ReturnType<typeof setInterval>;
     if (resendSeconds > 0) {
       t = setInterval(() => setResendSeconds((s) => (s > 0 ? s - 1 : 0)), 1000);
@@ -46,9 +51,10 @@ export function OTPVerificationScreen({ route, navigation }: Props) {
         phone_number: phoneNumber,
         otp_code: otp,
         country_code: countryCode,
-        ...(sessionToken && { session_token: sessionToken }),
+        session_token: sessionToken,
       });
-      const parent = navigation.getParent() as { reset?: (o: { routes: { name: string }[] }) => void } | undefined;
+      const rootNav = navigation.getParent() as { dispatch?: (a: unknown) => void } | undefined;
+      const dispatch = rootNav?.dispatch;
       if (result.requires_legal_accept) {
         navigation.replace('LegalAgreements');
         return;
@@ -58,10 +64,10 @@ export function OTPVerificationScreen({ route, navigation }: Props) {
         return;
       }
       if (!result.user.onboarding_completed) {
-        parent?.reset?.({ routes: [{ name: 'Onboarding' }] });
+        dispatch?.(CommonActions.reset({ index: 0, routes: [{ name: 'Onboarding' }] }));
         return;
       }
-      parent?.reset?.({ routes: [{ name: 'Main' }] });
+      dispatch?.(CommonActions.reset({ index: 0, routes: [{ name: 'Main' }] }));
     } catch (err: unknown) {
       const code = getApiErrorCode(err);
       const msg = getApiErrorMessage(err);

@@ -55,15 +55,16 @@ export function PhoneInputScreen({ navigation }: Props) {
     setError(null);
     setLoading(true);
     try {
-      const { data } = await api.post<{ data?: { session_token?: string } }>('/auth/request-otp', {
+      const res = await api.post<{ success?: boolean; data?: { session_token?: string; message?: string }; session_token?: string }>('/auth/request-otp', {
         phone_number: e164,
         country_code: defaultCountryCode,
       });
-      const sessionToken = data?.data?.session_token;
+      const body = res.data;
+      const sessionToken = body?.data?.session_token ?? body?.session_token ?? undefined;
       navigation.replace('OTPVerification', {
         phoneNumber: e164,
         countryCode: defaultCountryCode,
-        ...(sessionToken && { sessionToken }),
+        sessionToken,
       });
     } catch (err: unknown) {
       const msg = getApiErrorMessage(err);

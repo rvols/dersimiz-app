@@ -104,6 +104,8 @@
       "verified": "Onaylı Öğretmen",
       "pending_review": "İnceleme Bekliyor",
       "reviewing_profile": "Profilinizi inceliyoruz",
+      "rejected": "Başvuru Reddedildi",
+      "view_rejection_reason": "Sebebi görmek için dokunun",
       "complete_profile": "Profilinizi tamamlayın",
       "boost_visibility": "Öğrencilere görünürlüğünüzü artırın",
       "tap_to_complete": "Tamamlamak için dokunun",
@@ -112,6 +114,8 @@
       "missing_lessons": "Ders türü ve ücret ekleyin",
       "missing_availability": "Müsaitlik ayarlayın",
       "missing_education": "Eğitim ve sınıf ekleyin",
+      "quick_actions": "Hızlı İşlemler",
+      "grades_count": "{{count}} sınıf",
       "performance_overview": "Performans Özeti",
       "profile_views": "Profil Görüntülenme",
       "this_week": "Bu hafta",
@@ -120,11 +124,13 @@
       "lessons": "Aktif Dersler",
       "availability": "Müsaitlik",
       "manage_schedule": "Programınızı yönetin",
+      "hours_per_week": "Haftada {{hours}} saat",
       "peak_hours": "Yoğun Saatler",
       "most_views_evening": "En çok akşam görüntüleniyorsunuz",
       "popular_subject": "Popüler Konu",
       "mathematics_trending": "Matematik trendlerde",
-      "my_students": "Öğrencilerim"
+      "my_students": "Öğrencilerim",
+      "subscription_search_note": "Arama sonuçlarında görünmek için bir plana abone olmanız gerekir."
     },
     "student": {
       "greeting_label": "Hadi başlayalım",
@@ -199,6 +205,11 @@
   "profile": {
     "title": "Profil",
     "edit": "Profili düzenle",
+    "approval_hint": "Profil fotoğrafı ve isim değişikliği yeniden onay gerektirir.",
+    "status_approved": "Onaylı",
+    "status_pending": "Beklemede",
+    "status_rejected": "Reddedildi",
+    "avatar_updated": "Profil fotoğrafı güncellendi",
     "completeness": "Profil %{{percent}} tamamlandı",
     "logout": "Çıkış yap",
     "delete_account": "Hesabı sil",
@@ -229,6 +240,7 @@
   },
   "subscription": {
     "title": "Abonelik",
+    "transactions_title": "İşlemler",
     "current": "Mevcut plan",
     "renews": "Yenileme {{date}}",
     "plans": "Planlar",
@@ -237,7 +249,9 @@
     "per_month": "/ay",
     "per_year": "/yıl",
     "restore": "Satın alımları geri yükle",
-    "subscribe": "Abone ol"
+    "subscribe": "Abone ol",
+    "view_transactions": "İşlemleri görüntüle",
+    "no_transactions": "Henüz işlem yok"
   },
   "boosters": {
     "title": "Boostlar",
@@ -250,18 +264,27 @@
   },
   "support": {
     "title": "Destek",
-    "subject_placeholder": "Konu (isteğe bağlı)",
+    "subject_placeholder": "Konu (zorunlu)",
+    "subject_required": "Konu zorunludur",
     "support_label": "Destek",
     "placeholder": "Nasıl yardımcı olabiliriz?",
     "send": "Gönder",
     "status": "Durum",
     "open": "Açık",
     "replied": "Yanıtlandı",
-    "closed": "Kapalı"
+    "closed": "Kapalı",
+    "new_ticket": "Yeni Talep",
+    "create": "Oluştur",
+    "close_ticket": "Talep Kapat",
+    "no_tickets": "Henüz destek talebi yok. Yardım almak için oluşturun.",
+    "no_messages": "Henüz mesaj yok",
+    "subject_approval_process": "Onay süreci"
   },
   "notifications": {
     "title": "Bildirimler",
-    "empty": "Bildirim yok"
+    "empty": "Bildirim yok",
+    "approval_approved": "Profiliniz onaylandı!",
+    "approval_rejected": "Profiliniz reddedildi. Sebebini Destek sekmesinde görüntüleyin."
   },
   "availability": {
     "day_sun": "Paz",
@@ -299,6 +322,7 @@
   },
   "common": {
     "loading": "Yükleniyor...",
+    "back": "Geri",
     "unknown": "Bilinmiyor",
     "error": "Bir hata oluştu",
     "error_loading_data": "Veriler yüklenemedi",

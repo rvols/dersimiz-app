@@ -25,6 +25,7 @@ interface DashboardData {
 export function StudentDashboardScreen({ onFindTutors }: { onFindTutors?: () => void }) {
   const { t } = useTranslation();
   const user = useAuthStore((s) => s.user);
+  const hydrate = useAuthStore((s) => s.hydrate);
   const [data, setData] = useState<DashboardData | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const scaleAnim = new Animated.Value(1);
@@ -42,6 +43,7 @@ export function StudentDashboardScreen({ onFindTutors }: { onFindTutors?: () => 
 
   const onRefresh = async () => {
     setRefreshing(true);
+    await hydrate();
     await load();
     setRefreshing(false);
   };
@@ -119,30 +121,36 @@ export function StudentDashboardScreen({ onFindTutors }: { onFindTutors?: () => 
         </Pressable>
       </Animated.View>
 
-      {/* Quick Stats - Bento Grid Style */}
+      {/* Quick Stats - stacked vertically */}
       <View style={styles.statsGrid}>
         <Card variant="student" style={styles.statCard} onPress={() => { }}>
           <View style={styles.statIconWrap}>
             <Ionicons name="heart" size={24} color={colors.sparkOrange} />
           </View>
-          <Text style={styles.statValue}>{data?.favorites_count ?? 0}</Text>
-          <Text style={styles.statLabel}>{t('dashboard.student.favorites')}</Text>
+          <View style={styles.statTextWrap}>
+            <Text style={styles.statValue}>{data?.favorites_count ?? 0}</Text>
+            <Text style={styles.statLabel}>{t('dashboard.student.favorites')}</Text>
+          </View>
         </Card>
 
         <Card variant="student" style={styles.statCard} onPress={() => { }}>
           <View style={styles.statIconWrap}>
             <Ionicons name="chatbubbles" size={24} color={colors.neonLime} />
           </View>
-          <Text style={styles.statValue}>{data?.active_conversations ?? 0}</Text>
-          <Text style={styles.statLabel}>{t('dashboard.student.chats')}</Text>
+          <View style={styles.statTextWrap}>
+            <Text style={styles.statValue}>{data?.active_conversations ?? 0}</Text>
+            <Text style={styles.statLabel}>{t('dashboard.student.chats')}</Text>
+          </View>
         </Card>
 
-        <Card variant="student" style={[styles.statCard, styles.statCardWide]} onPress={() => { }}>
+        <Card variant="student" style={styles.statCard} onPress={() => { }}>
           <View style={styles.statIconWrap}>
             <Ionicons name="calendar" size={24} color={colors.electricAzure} />
           </View>
-          <Text style={styles.statValue}>{data?.upcoming_demos ?? 0}</Text>
-          <Text style={styles.statLabel}>{t('dashboard.student.upcoming_demos')}</Text>
+          <View style={styles.statTextWrap}>
+            <Text style={styles.statValue}>{data?.upcoming_demos ?? 0}</Text>
+            <Text style={styles.statLabel}>{t('dashboard.student.upcoming_demos')}</Text>
+          </View>
         </Card>
       </View>
 
@@ -304,20 +312,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   statsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: 'column',
     gap: spacing.sm,
     marginBottom: spacing.lg,
   },
   statCard: {
-    flex: 1,
-    minWidth: '47%',
+    flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: spacing.lg,
+    padding: spacing.lg,
+    gap: spacing.md,
   },
-  statCardWide: {
-    minWidth: '100%',
-  },
+  statCardWide: {},
   statIconWrap: {
     width: 48,
     height: 48,
@@ -325,7 +330,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.mistBlue,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: spacing.sm,
+  },
+  statTextWrap: {
+    flex: 1,
   },
   statValue: {
     ...typography.stats,
@@ -382,26 +389,30 @@ const styles = StyleSheet.create({
     color: colors.slateText,
   },
   quickActions: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.md,
+    flexDirection: 'column',
+    gap: spacing.sm,
   },
   quickAction: {
+    flexDirection: 'row',
     alignItems: 'center',
-    width: '22%',
+    backgroundColor: colors.cleanWhite,
+    padding: spacing.lg,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.sparkOrange + '20',
   },
   quickActionIcon: {
-    width: 56,
-    height: 56,
-    borderRadius: 16,
+    width: 48,
+    height: 48,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: spacing.xs,
+    marginRight: spacing.md,
   },
   quickActionText: {
-    ...typography.caption,
+    ...typography.body,
     color: colors.carbonText,
-    textAlign: 'center',
-    fontWeight: '500',
+    fontWeight: '600',
+    flex: 1,
   },
 });

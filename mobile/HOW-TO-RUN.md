@@ -335,6 +335,8 @@ The mobile app only works if the **backend API** is running. If your backend is 
 
 The app calls the API at **`<your URL>/api/v1`**. For example, if `EXPO_PUBLIC_API_URL` is `http://192.168.1.5:3000`, the app uses `http://192.168.1.5:3000/api/v1`. Your backend must respond on that path (see `API-BACKEND-MOBILE.md`).
 
+**Profile image upload:** Set `BASE_URL` in the API `.env` to the same URL the app uses (e.g. `http://192.168.1.5:3000` when testing on a device). Otherwise, uploaded avatars will have `localhost` in the URL and won't load on the phone.
+
 ---
 
 ## 7. Start the Mobile App
